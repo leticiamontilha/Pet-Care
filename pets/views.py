@@ -17,13 +17,13 @@ class PetViews(APIView, PageNumberPagination):
         traits_data = serializer.validated_data.pop("traits")
         group_data = serializer.validated_data.pop("group")
         
-        group = Group.objects.get(
-            scientific_name__iexact=group_data["scientific_name"]
-        )
-        
-        if not group:
+        try:
+            group = Group.objects.get(
+                scientific_name__iexact=group_data["scientific_name"]
+            )
+        except Group.DoesNotExist:
             group = Group.objects.create(**group_data)
-
+        
         pet = Pet.objects.create(**serializer.validated_data, group=group)
 
         for trait_el in traits_data:
